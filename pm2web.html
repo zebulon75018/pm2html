@@ -15,6 +15,19 @@
     </head>
 <body>
     <script>
+
+        /**
+ * Converts a long string of bytes into a readable format e.g KB, MB, GB, TB, YB
+ * 
+ * @param {Int} num The number of bytes.
+ */
+function readableBytes(bytes) {
+    var i = Math.floor(Math.log(bytes) / Math.log(1024)),
+    sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    return (bytes / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + sizes[i];
+}
+
 $.getJSON( "http://localhost:9615", function( data ) {
   var items = [];
   console.log(data["monit"]);
@@ -46,7 +59,10 @@ $.getJSON( "http://localhost:9615", function( data ) {
       </div>
       <div class="card-stacked">
         <div class="card-content">
-<p>                Total
+<p> 
+    <img src="http://icons.iconarchive.com/icons/tpdkdesign.net/refresh-cl/256/System-Memory-icon.png" width="50px" />               Total : {%=readableBytes(o.monit.total_mem)%}
+    
+    Free : {%=readableBytes(o.monit.free_mem)%}
     Memoire used : 
         <progress value="{%=o.monit.total_mem-o.monit.free_mem%}" max="{%=o.monit.total_mem%}"></progress>
     
@@ -62,8 +78,8 @@ $.getJSON( "http://localhost:9615", function( data ) {
             <div class="card-content">
 
         <li>{%=o.processes[i].name%}</li>
-
-       {%=o.processes[i].monit.cpu%} : {%=o.processes[i].monit.memory%}  <progress value="{%=o.processes[i].monit.memory%}" max="{%=o.monit.total_mem%}"></progress>
+        
+       {%=o.processes[i].monit.cpu%} : {%=readableBytes(o.processes[i].monit.memory)%}  <progress value="{%=o.processes[i].monit.memory%}" max="{%=o.monit.total_mem%}"></progress>
             </div>
     </div>
         {% } %}
@@ -75,7 +91,7 @@ $.getJSON( "http://localhost:9615", function( data ) {
       </div>
     </div>
 
-        
+    
     <h2 class="header">CPU  : </h2>
 
             {% for (var i=0; i<o.monit.cpu.length; i++) { %}
