@@ -47,11 +47,10 @@ $.getJSON( "http://localhost:9615", function( data ) {
       <div class="card-stacked">
         <div class="card-content">
 <p>                Total
+    Memoire used : 
+        <progress value="{%=o.monit.total_mem-o.monit.free_mem%}" max="{%=o.monit.total_mem%}"></progress>
     
-    
-                {%=o.monit.total_mem %}
-                Free 
-                {%=o.monit.free_mem %}
+                
               </p>
 
               
@@ -64,7 +63,7 @@ $.getJSON( "http://localhost:9615", function( data ) {
 
         <li>{%=o.processes[i].name%}</li>
 
-       {%=o.processes[i].monit.cpu%} : {%=o.processes[i].monit.memory%}
+       {%=o.processes[i].monit.cpu%} : {%=o.processes[i].monit.memory%}  <progress value="{%=o.processes[i].monit.memory%}" max="{%=o.monit.total_mem%}"></progress>
             </div>
     </div>
         {% } %}
