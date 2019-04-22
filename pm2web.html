@@ -1,0 +1,106 @@
+<html>
+<head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-JavaScript-Templates/3.11.0/js/tmpl.js"></script>
+    
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/circliful/1.2.1/js/jquery.circliful.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/circliful/1.2.1/css/jquery.circliful.css"><link>
+              
+    </head>
+<body>
+    <script>
+$.getJSON( "http://localhost:9615", function( data ) {
+  var items = [];
+  console.log(data["monit"]);
+  console.log(data["monit"]["total_mem"]);
+  console.log(data["monit"]["free_mem"]);
+  console.log(data["processes"]);
+  console.log(data["system_info"]["hostname"]);
+  console.log(data["system_info"]["uptime"]);
+
+  $.each( data["monit"], function( key, val ) {
+    items.push( "<li id='" + key + "'>" + val + "</li>" );
+  });
+
+  $( "<ul/>", {
+    "class": "my-new-list",
+    html: items.join( "" )
+  }).appendTo( "body" );
+  document.getElementById("result").innerHTML = tmpl("tmpl-demo", data);
+});
+
+</script>
+
+<script type="text/x-tmpl" id="tmpl-demo">
+   
+    <h2 class="header">{%=o.system_info.hostname%} : {%=o.system_info.uptime%}</h2>
+    <div class="card horizontal">
+      <div class="card-image">
+        <img src="https://lorempixel.com/100/190/nature/6">
+      </div>
+      <div class="card-stacked">
+        <div class="card-content">
+<p>                Total
+    
+    
+                {%=o.monit.total_mem %}
+                Free 
+                {%=o.monit.free_mem %}
+              </p>
+
+              
+    <h4 class="header">Process : </h4>
+    
+    {% for (var i=0; i<o.processes.length; i++) { %}
+
+    <div class="card horizontal">
+            <div class="card-content">
+
+        <li>{%=o.processes[i].name%}</li>
+
+       {%=o.processes[i].monit.cpu%} : {%=o.processes[i].monit.memory%}
+            </div>
+    </div>
+        {% } %}
+    
+        </div>
+        <div class="card-action">
+          <a href="#">This is a link</a>
+        </div>
+      </div>
+    </div>
+
+        
+    <h2 class="header">CPU  : </h2>
+
+            {% for (var i=0; i<o.monit.cpu.length; i++) { %}
+            <div class="card horizontal">
+                    <div class="card-content">
+                            <p>
+   
+            <li>{%=o.monit.cpu[i].model%}</li>
+                <li>{%=o.monit.cpu[i].speed%}</li>
+                {%=o.monit.cpu[i].times.idle%} : {%=o.monit.cpu[i].times.sys%} :  {%=o.monit.cpu[i].times.user%}
+            </p>
+        </div>
+    </div>
+
+            
+                {% } %}
+            
+    </script>
+
+<div class="container">
+    <div class="row">
+            <div id="result"></div>
+        </div>
+</div>
+</body>
+
+</html> 
