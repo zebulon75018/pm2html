@@ -47,23 +47,17 @@ function readableBytes(bytes) {
 
 $.getJSON( "http://localhost:9615", function( data ) {
   var items = [];
-  console.log(data["monit"]);
-  console.log(data["monit"]["total_mem"]);
-  console.log(data["monit"]["free_mem"]);
+  console.log(data);
+  console.log(data["monit"]["interfaces"]);
   console.log(data["processes"]);
-  console.log(data["system_info"]["hostname"]);
-  console.log(data["system_info"]["uptime"]);
+
 
   console.log(typeof(data.processes[0].pm2_env.env))
   $.each( data["monit"], function( key, val ) {
     items.push( "<li id='" + key + "'>" + val + "</li>" );
   });
 
-  $( "<ul/>", {
-    "class": "my-new-list",
-    html: items.join( "" )
-  }).appendTo( "body" );
-  document.getElementById("result").innerHTML = tmpl("tmpl-demo", data);
+ 
 });
 
 </script>
@@ -83,10 +77,11 @@ $.getJSON( "http://localhost:9615", function( data ) {
     Free : {%=readableBytes(o.monit.free_mem)%}
     Memoire used : 
         <progress value="{%=o.monit.total_mem-o.monit.free_mem%}" max="{%=o.monit.total_mem%}"></progress>
-    
-                
               </p>
-
+              Load Average : {% for (let value of Object.values(o.monit.loadavg)) { %}
+               {%= value %}
+              {% } %}
+         
               
     <h4 class="header">Process : </h4>
     
@@ -95,7 +90,7 @@ $.getJSON( "http://localhost:9615", function( data ) {
     <div class="card horizontal">
             <div class="card-content">
 
-        <li onclick="$('#env{%=i%}').toggle()" style="cursor:hand">{%=o.processes[i].name%}
+        <li onclick="$('#env{%=i%}').toggle()" style="  cursor:hand">{%=o.processes[i].name%}
         
        {%=o.processes[i].monit.cpu%} : {%=readableBytes(o.processes[i].monit.memory)%}  <progress value="{%=o.processes[i].monit.memory%}" max="{%=o.monit.total_mem%}"></progress>
         </li>
@@ -117,14 +112,37 @@ $.getJSON( "http://localhost:9615", function( data ) {
         <div class="card-content">
                     
 
-        <li>{%=o.monit.cpu[i].model%}</li>
-            <li>{%=o.monit.cpu[i].speed%}</li>
-            {%=o.monit.cpu[i].times.idle%} : {%=o.monit.cpu[i].times.sys%} :  {%=o.monit.cpu[i].times.user%}
+        <li onclick="$('#cpu{%=i%}').toggle()" style="  cursor:hand" >{%=o.monit.cpu[i].model%}</li>
+         <ul id="cpu{%=i%}" style="display:none" >
+            <li>Speed : {%=o.monit.cpu[i].speed%} Hz</li>
+            <li>Idle : {%=o.monit.cpu[i].times.idle%} 
+            <li>Sys : {%=o.monit.cpu[i].times.sys%} 
+            <li>User : {%=o.monit.cpu[i].times.user%}
+         </ul>
         </div>
     
         </div>
             {% } %}
-    
+
+            <img src="https://media.screwfix.com/is/image//ae235?src=ae235/12840_P&$prodImageMedium$" width="45px" />
+            <h4 class="header">Network  : </h4>
+    {% for (let key of Object.keys(o.monit.interfaces)) { %}
+
+        <div class="card horizontal">
+        <div class="card-content">
+         <span ><b>{%=key%}</b></span>
+         <ul>
+         {% for (var i=0; i<o.monit.interfaces[key].length; i++) { %}
+         <hr>
+             <li>  Adress {%= o.monit.interfaces[key][i].address%}
+                <li> NetMask {%= o.monit.interfaces[key][i].netmask%}
+                <li>   Family {%= o.monit.interfaces[key][i].family%}
+                <li>  Mac {%= o.monit.interfaces[key][i].mac%}
+               {% } %}
+                </ul>
+        </div>
+        </div>
+        {% } %}
         </div>
         <div class="card-action">
           <a href="#">This is a link</a>
